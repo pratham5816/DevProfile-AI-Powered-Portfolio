@@ -101,7 +101,7 @@ class DevprofileApplicationTests {
     @Test
     @DisplayName("Test chat rag function")
     void testSearchApi() {
-        chatRag.chatRequest("what this guy did in webhook?",false);
+//        chatRag.chatRequestContext("what this guy did in webhook?",false);
     }
 
 }

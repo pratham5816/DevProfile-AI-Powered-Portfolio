@@ -1,4 +1,14 @@
 package com.portfolio.devprofile.dto;
 
-public record ChatMessage(String role, String content) {}
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+@AllArgsConstructor
+public class ChatMessage{
+    private String role;
+    private String content;
+}
 

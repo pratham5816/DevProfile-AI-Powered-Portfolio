@@ -1,21 +1,19 @@
 package com.portfolio.devprofile.vectorstore;
 
+import com.portfolio.devprofile.dto.SearchRequest;
+import com.portfolio.devprofile.dto.SearchResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class QdrantVectorStore {
 
     private final RestClient restClient;
     private final String collectionName;
-    public record SearchRequest(List<Float> vector, int limit, boolean with_payload) {}
-    public record ScoredPoint(String id, double score, Map<String, Object> payload) {}
-    public record SearchResponse(List<ScoredPoint> scores) {}
 
     public QdrantVectorStore(@Value("${qdrant.url}") String baseUrl, @Value("${qdrant.api-key}")  String apiKey, @Value("${qdrant.collection-name}") String collectionName) {
         this.collectionName = collectionName;
@@ -48,15 +46,16 @@ public class QdrantVectorStore {
                    .toEntity(String.class);
     }
 
-    public SearchResponse searchPoints(List<Float> vector, int limit, boolean with_payload) {
+    public SearchResponse searchPoints(List<Float> vector, int limit) {
 
         if(vector == null || vector.isEmpty()) {
             throw new IllegalArgumentException("List of points cannot be null or empty");
         }
-        SearchRequest searchRequest = new SearchRequest(vector, limit, with_payload);
+
+        SearchRequest searchRequest = new SearchRequest(vector, limit, true);
 
         return restClient.post()
-                .uri("collections/{collectionsName}/search", collectionName)
+                .uri("collections/{collectionsName}/points/search", collectionName)
                 .accept(MediaType.APPLICATION_JSON)
                 .body(searchRequest)
                 .retrieve()

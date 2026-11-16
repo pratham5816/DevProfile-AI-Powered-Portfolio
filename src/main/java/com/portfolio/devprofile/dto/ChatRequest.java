@@ -1,6 +1,17 @@
 package com.portfolio.devprofile.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.List;
 
-public record ChatRequest(String model, List<ChatMessage> messages, boolean stream) {}
+@AllArgsConstructor
+@Setter
+@Getter
+public class ChatRequest {
+    private String model;
+    private List<ChatMessage> messages;
+    private boolean stream;
+}
 
