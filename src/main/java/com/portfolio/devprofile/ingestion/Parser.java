@@ -1,5 +1,6 @@
 package com.portfolio.devprofile.ingestion;
 
+import com.portfolio.devprofile.dto.Document;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -50,6 +51,24 @@ public class Parser {
         }
         catch (Exception e) {
             throw new RuntimeException("Failed to parse CSV file", e);
+        }
+    }
+
+    public List<Document> parseMarkdown(InputStream inputStream, String defaultTitle) {
+        List<Document> documents = new ArrayList<>();
+        try {
+            String text = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+            String[] sections = text.split("(?=## )");
+            for (String section : sections) {
+                String trimmed = section.trim();
+                if (trimmed.length() > 20) {
+                    String id = UUID.randomUUID().toString();
+                    documents.add(new Document(id, trimmed, defaultTitle));
+                }
+            }
+            return documents;
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to parse markdown: " + defaultTitle, e);
         }
     }
 }

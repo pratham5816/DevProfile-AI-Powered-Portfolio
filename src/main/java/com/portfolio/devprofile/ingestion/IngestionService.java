@@ -1,5 +1,6 @@
 package com.portfolio.devprofile.ingestion;
 
+import com.portfolio.devprofile.dto.Document;
 import com.portfolio.devprofile.embedding.OllamaEmbeddingService;
 import com.portfolio.devprofile.vectorstore.Point;
 import com.portfolio.devprofile.vectorstore.QdrantVectorStore;
@@ -23,6 +24,7 @@ public class IngestionService {
         this.ollamaEmbeddingService = ollamaEmbeddingService;
         this.qdrantVectorStore = qdrantVectorStore;
     }
+
     public void runIngestion(){
         try{
             InputStream stream = getClass().getResourceAsStream("/data/work_portfolio.csv");
@@ -38,5 +40,31 @@ public class IngestionService {
             throw new RuntimeException(e);
         }
 
+    }
+
+    public void ingestResource(String resourcePath, String defaultTitle) {
+        try (InputStream stream = getClass().getResourceAsStream(resourcePath)) {
+            if (stream == null) {
+                System.err.println("Resource not found: " + resourcePath);
+                return;
+            }
+            List<Document> documents = parser.parseMarkdown(stream, defaultTitle);
+            List<Point> points = new ArrayList<>();
+            for (Document document : documents) {
+                Map<String, Object> payload = Map.of("content", document.content(), "title", document.title());
+                List<Float> list = ollamaEmbeddingService.embed(document.content());
+                points.add(new Point(document.id(), list, payload));
+            }
+            qdrantVectorStore.upsertPoints(points);
+            System.out.println("Successfully ingested " + points.size() + " points from " + resourcePath);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to ingest " + resourcePath, e);
+        }
+    }
+
+    public void ingestProjectsAndEducation() {
+        ingestResource("/data/education.md", "Education & CDAC");
+        ingestResource("/data/projects/vehicle-tracker.md", "Project: Vehicle Tracker");
+        ingestResource("/data/projects/devprofile-ai.md", "Project: DevProfile AI");
     }
 }

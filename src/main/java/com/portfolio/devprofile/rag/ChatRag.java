@@ -1,6 +1,7 @@
 package com.portfolio.devprofile.rag;
 
 import com.portfolio.devprofile.dto.*;
+import com.portfolio.devprofile.embedding.CohereEmbeddingService;
 import com.portfolio.devprofile.embedding.OllamaEmbeddingService;
 import com.portfolio.devprofile.vectorstore.QdrantVectorStore;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ public class ChatRag {
     private OllamaEmbeddingService ollamaEmbeddingService;
     private QdrantVectorStore qdrantVectorStore;
     private int limit;
+    private CohereEmbeddingService cohereEmbeddingService;
 
     public ChatRag(@Value("${ollama.model.chat}") String model,
                    @Value("${ollama.base-url}") String baseUrl,
@@ -31,7 +33,8 @@ public class ChatRag {
                    @Value("${cohere.api-key}") String cohereApiKey,
                    @Value("${cohere.base-url}") String cohereBaseUrl,
                    @Value("${cohere.model.chat}") String cohereModel,
-                   @Value("${cohere.model.chat.systemMessage}") String cohereSystemMessage) {
+                   @Value("${cohere.model.chat.systemMessage}") String cohereSystemMessage,
+                   @Autowired CohereEmbeddingService cohereEmbeddingService) {
          this.restClient = RestClient.builder().baseUrl(baseUrl).build();
          this.restClientCohere = RestClient.builder().baseUrl(cohereBaseUrl).defaultHeader("Authorization", "Bearer " + cohereApiKey).build();
          this.model = model;
@@ -40,6 +43,7 @@ public class ChatRag {
          this.qdrantVectorStore = qdrantVectorStore;
          this.limit = limit;
          this.cohereSystemMessage = cohereSystemMessage;
+         this.cohereEmbeddingService = cohereEmbeddingService;
     }
 
 
@@ -59,7 +63,7 @@ public class ChatRag {
             throw new IllegalArgumentException("userQuery cannot be null");
         }
 
-        List<Float> vector = ollamaEmbeddingService.embed(userQuery);
+        List<Float> vector = cohereEmbeddingService.embed(userQuery , "search_query");
 
         if(vector == null){
             throw new IllegalArgumentException("problem converting user input");

@@ -7,6 +7,7 @@ import com.portfolio.devprofile.rag.ChatRag;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/chat")
 public class ChatController {
@@ -91,6 +93,22 @@ public class ChatController {
 
         return response;
     }
+
+
+    @PostMapping("/cohere/rag/v1")
+    public String chatRagCoherV1(@RequestBody ChatRequest chatRequest){
+        System.out.println("Chat request: " + chatRequest);
+
+        String response = chatRag.chatRequestCohere(chatRequest.getMessages().get(0).getContent() ,false);
+
+        if(response == null){
+            throw new HttpClientErrorException(HttpStatus.SERVICE_UNAVAILABLE,"Error calling model request");
+        }
+
+        return response;
+    }
+
+
 
 
 

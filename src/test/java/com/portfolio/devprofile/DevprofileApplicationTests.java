@@ -3,8 +3,9 @@ package com.portfolio.devprofile;
 import com.portfolio.devprofile.dto.ChatMessage;
 import com.portfolio.devprofile.dto.ChatResponse;
 import com.portfolio.devprofile.dto.SearchResponse;
+import com.portfolio.devprofile.embedding.CohereEmbeddingService;
 import com.portfolio.devprofile.embedding.OllamaEmbeddingService;
-import com.portfolio.devprofile.ingestion.Document;
+import com.portfolio.devprofile.dto.Document;
 import com.portfolio.devprofile.ingestion.IngestionService;
 import com.portfolio.devprofile.ingestion.Parser;
 import com.portfolio.devprofile.vectorstore.QdrantVectorStore;
@@ -33,6 +34,8 @@ class DevprofileApplicationTests {
     OllamaEmbeddingService ollamaEmbeddingService;
     @Autowired
     ChatRag chatRag;
+    @Autowired
+    CohereEmbeddingService cohereEmbeddingService;
 
 	@Test
 	void contextLoads() {
@@ -81,6 +84,12 @@ class DevprofileApplicationTests {
     }
 
     @Test
+    @DisplayName("Test document ingestion service remote")
+    void  testDocumentIngestionServiceRemote() {
+        cohereEmbeddingService.runIngestionBatch();
+    }
+
+    @Test
     @DisplayName("Test vector db search")
     void testVectorDbSearch() {
         List<Float> vector =  ollamaEmbeddingService.embed("What pratham did in Webhhook Integration");
@@ -99,9 +108,16 @@ class DevprofileApplicationTests {
     }
 
     @Test
+    @DisplayName("Test ingest projects and education markdown documents")
+    void testIngestProjectsAndEducation() {
+        ingestionService.ingestProjectsAndEducation();
+    }
+
+    @Test
     @DisplayName("Test chat rag function")
     void testSearchApi() {
-//        chatRag.chatRequestContext("what this guy did in webhook?",false);
+        String answer = chatRag.chatRequestCohere("What did Pratham do in CDAC and the vehicle tracker project?", false);
+        System.out.println("Answer: " + answer);
     }
 
 }

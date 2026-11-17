@@ -1,4 +1,4 @@
-package com.portfolio.devprofile.ingestion;
+package com.portfolio.devprofile.dto;
 
 public record Document(String id,
                        String content,
