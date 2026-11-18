@@ -73,20 +73,22 @@ public class ChatRag {
 
         List<ScoredPoint> points = response.result();
 
-        StringBuilder content =  new StringBuilder(userQuery + "\n\n");
+        StringBuilder content =  new StringBuilder(userQuery + "\n\n" + "Context from the documents via vector db: " + "\n\n");
 
         for(ScoredPoint point : points){
             content.append(point.payload().get("content") + "\n\n");
         }
 
-//        System.out.println("------------------------------------------------");
-//        System.out.println("context for llm with query " + content.toString());
-//        System.out.println("------------------------------------------------");
+        System.out.println("------------------------------------------------");
+        System.out.println("context for llm with query " + content.toString());
+        System.out.println("------------------------------------------------");
 
         ChatRequest chatRequest = new ChatRequest(
                 cohereModel,
                 List.of(new ChatMessage("system", cohereSystemMessage) , new ChatMessage("user", content.toString())) , stream);
 
+        String temp = chatRequest.toString();
+        System.out.println("============= " + temp);
         ChatResponse chatResponse = restClientCohere.post()
                 .uri("/v2/chat")
                 .accept(MediaType.APPLICATION_JSON)
