@@ -110,7 +110,7 @@ class DevprofileApplicationTests {
     @Test
     @DisplayName("Test ingest projects and education markdown documents")
     void testIngestProjectsAndEducation() {
-        ingestionService.ingestProjectsAndEducation();
+        ingestionService.ingestTest();
     }
 
     @Test
@@ -119,5 +119,56 @@ class DevprofileApplicationTests {
         String answer = chatRag.chatRequestCohere("What did Pratham do in CDAC and the vehicle tracker project?", false);
         System.out.println("Answer: " + answer);
     }
+
+    @Test
+    @DisplayName("Test parser with md file DAC-Project file")
+    void testParserWithMdActualFile() throws Exception {
+        try (InputStream stream = getClass().getResourceAsStream("/data/projects/eatclub.md")) {
+            // Check file exists
+            assertNotNull(stream, "md should exist in resources");
+            List<Document> docs = parser.parseMarkdown(stream,"DAC Project");
+            System.out.println("Total documents parsed: " + docs.size());
+            assertFalse(docs.isEmpty(), "Documents list should not be empty");
+
+            // Print first document to inspect output
+            for(Document doc : docs) {;
+                System.out.println("-------------------------------------------------------------------------------");
+                System.out.println(doc);
+                System.out.println("--------------------------------------------------------------------------------");
+            }
+        }
+    }
+
+    @Test
+    @DisplayName("Test parser with md file DAC-Project file")
+    void testParserWithMdActualFile1() throws Exception {
+        try (InputStream stream = getClass().getResourceAsStream("/data/projects/vehicle-tracker.md")) {
+            // Check file exists
+            assertNotNull(stream, "md should exist in resources");
+            List<Document> docs = parser.parseMarkdown(stream,"DAC Project");
+            System.out.println("Total documents parsed: " + docs.size());
+            assertFalse(docs.isEmpty(), "Documents list should not be empty");
+
+            // Print first document to inspect output
+            for(Document doc : docs) {;
+                System.out.println("-------------------------------------------------------------------------------");
+                System.out.println(doc);
+                System.out.println("--------------------------------------------------------------------------------");
+            }
+        }
+    }
+
+    @Test
+    @DisplayName("Test md files documents")
+    void testParserMdDocuments() throws Exception {
+        ingestionService.ingestTest();
+    }
+
+    @Test
+    @DisplayName("Ingest md files")
+    void  testIngestMdDocuments() throws Exception {
+        ingestionService.ingestMdFiles();
+    }
+
 
 }

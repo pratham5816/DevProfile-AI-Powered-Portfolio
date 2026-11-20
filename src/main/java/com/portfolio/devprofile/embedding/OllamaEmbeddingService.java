@@ -14,7 +14,6 @@ public class OllamaEmbeddingService implements EmbeddingServices{
 
     private final String model;
     private final RestClient restClient;
-
     public OllamaEmbeddingService(@Value("${ollama.base-url}") String baseUrl , @Value("${ollama.model.embedding}") String model){
         this.model = model;
         this.restClient = RestClient.builder().baseUrl(baseUrl).build();
